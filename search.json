@@ -1,23 +1,9 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "GitHub repository usage statistics",
-    "section": "",
-    "text": "False"
-  },
-  {
-    "objectID": "index.html#espa-spbbspatial-bootlong-difftop-barb-repos-statistics",
-    "href": "index.html#espa-spbbspatial-bootlong-difftop-barb-repos-statistics",
-    "title": "GitHub repository usage statistics",
-    "section": "ESPA, SPBBspatial, bootLong, diffTop, BARB repos statistics",
-    "text": "ESPA, SPBBspatial, bootLong, diffTop, BARB repos statistics"
-  },
-  {
     "objectID": "index.html#summary-of-total-unique-clone-since-may-19-2026",
     "href": "index.html#summary-of-total-unique-clone-since-may-19-2026",
     "title": "GitHub repository usage statistics",
     "section": "Summary of total unique clone since May 19, 2026",
-    "text": "Summary of total unique clone since May 19, 2026"
+    "text": "Summary of total unique clone since May 19, 2026\n\n\nESPA 200\nSPBBspatial 200\nbootLong 200\ndiffTop 200\nBARBI 200\n\nSaved to: github_clone_history_all_repos.xlsx"
   }
 ]
