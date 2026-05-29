@@ -1,0 +1,23 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "GitHub repository usage statistics",
+    "section": "",
+    "text": "import requests\nimport pandas as pd\nfrom pathlib import Path\nimport matplotlib.pyplot as plt"
+  },
+  {
+    "objectID": "index.html#espa-spbbspatial-bootlong-difftop-barb-repos-statistics",
+    "href": "index.html#espa-spbbspatial-bootlong-difftop-barb-repos-statistics",
+    "title": "GitHub repository usage statistics",
+    "section": "ESPA, SPBBspatial, bootLong, diffTop, BARB repos statistics",
+    "text": "ESPA, SPBBspatial, bootLong, diffTop, BARB repos statistics\n\nOWNER = \"PratheepaJ\"\nREPOS = [\"ESPA\", \"SPBBspatial\", \"bootLong\", \"diffTop\", \"BARBI\"]\n\nTOKEN = \"\"\n\nOUTFILE = Path(\"github_clone_history_all_repos.xlsx\")\n\nheaders = {\n    \"Authorization\": f\"token {TOKEN}\",\n    \"Accept\": \"application/vnd.github+json\"\n}\n\nall_repo_data = {}\n\nfor repo in REPOS:\n    url = f\"https://api.github.com/repos/{OWNER}/{repo}/traffic/clones\"\n\n    response = requests.get(url, headers=headers)\n    print(repo, response.status_code)\n\n    if response.status_code != 200:\n        print(response.text)\n        continue\n\n    data = response.json()\n\n    new_data = pd.DataFrame(data[\"clones\"])\n\n    if new_data.empty:\n        new_data = pd.DataFrame(columns=[\"date\", \"total_clones\", \"unique_clones\"])\n    else:\n        new_data[\"date\"] = pd.to_datetime(new_data[\"timestamp\"]).dt.date\n        new_data = new_data[[\"date\", \"count\", \"uniques\"]]\n        new_data = new_data.rename(columns={\n            \"count\": \"total_clones\",\n            \"uniques\": \"unique_clones\"\n        })\n\n    # If Excel file already exists, read old sheet for this repo\n    if OUTFILE.exists():\n        try:\n            old_data = pd.read_excel(OUTFILE, sheet_name=repo)\n            old_data = old_data[[\"date\", \"total_clones\", \"unique_clones\"]]\n            old_data[\"date\"] = pd.to_datetime(old_data[\"date\"]).dt.date\n            \n\n            combined = pd.concat([old_data, new_data], ignore_index=True)\n            combined = combined.drop_duplicates(subset=\"date\", keep=\"last\")\n        except ValueError:\n            combined = new_data\n    else:\n        combined = new_data\n\n    combined = combined.sort_values(\"date\").reset_index(drop=True)\n\n\n    combined[\"cumulative_unique_clones\"] = combined[\"unique_clones\"].cumsum()\n    combined[\"cumulative_total_clones\"] = combined[\"total_clones\"].cumsum()\n    \n\n    all_repo_data[repo] = combined\n\n# Save each repository as a separate sheet\nwith pd.ExcelWriter(OUTFILE, engine=\"openpyxl\") as writer:\n    for repo, df in all_repo_data.items():\n        df.to_excel(writer, sheet_name=repo, index=False)\n\nprint(\"\\nSaved to:\", OUTFILE)\n\nESPA 200\nSPBBspatial 200\nbootLong 200\ndiffTop 200\nBARBI 200\n\nSaved to: github_clone_history_all_repos.xlsx"
+  },
+  {
+    "objectID": "index.html#plot-total-unique-clone-since-may-19-2026",
+    "href": "index.html#plot-total-unique-clone-since-may-19-2026",
+    "title": "GitHub repository usage statistics",
+    "section": "Plot total unique clone since May 19, 2026",
+    "text": "Plot total unique clone since May 19, 2026\n\n\nFILE = \"github_clone_history_all_repos.xlsx\"\n\nxls = pd.ExcelFile(FILE)\n\nresults = []\n\nfor repo in xls.sheet_names:\n\n    df = pd.read_excel(FILE, sheet_name=repo)\n\n    latest_total = df[\"cumulative_unique_clones\"].iloc[-1]\n\n    results.append({\n        \"Repository\": repo,\n        \"Unique Clones\": latest_total\n    })\n\nsummary = pd.DataFrame(results)\n\nsummary = summary.sort_values(\n    \"Unique Clones\",\n    ascending=False\n)\n\nplt.figure(figsize=(8, 5))\n\nplt.bar(\n    summary[\"Repository\"],\n    summary[\"Unique Clones\"]\n)\n\nplt.ylabel(\"Cumulative Unique Clones\")\nplt.title(\"GitHub Package Usage\")\nplt.xticks(rotation=45)\n\nfor i, v in enumerate(summary[\"Unique Clones\"]):\n    plt.text(i, v, str(int(v)), ha=\"center\", va=\"bottom\")\n\nplt.tight_layout()\nplt.show()"
+  }
+]
